@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<%@page language="PL/SQL"%>
+<%@plsql procedure="Daily_smartplug_consumption"%>
+<head>
+<title>Daily Smart Plug Consumption</title>
+<style>
+
+li {
+    float: left;
+}
+
+
+table, td, th {
+    border: 1px solid white;
+	color: white;
+}
+</style>
+
+</head>
+<body>
+<div align="center"><p><h1>Daily Smartplug Consumption Report</p></h1>
+<hr/></div>
+<!-- Start Page Content -->
+<a>Enter the information of the Smartplug: <br />
+(All entries have to be completed)</a>
+<form action="http://oracle.is.umbc.edu:8080/classpsp/IS420_DREAM_TEAM.Daily_smartplug_consumption_report">
+<a>Smart Plug: <select name="splug_id_val" required> </a>
+<% for cursor_row in (select splug_id from smart_plug) loop %>
+<option value="<%=cursor_row.splug_id%>"><%=cursor_row.splug_id%></option>
+<% end loop; %>
+</select> <br /><br />
+<a>Start Date: <input type="date" name="start_date" id = "start_date_id" required><br /><br /> </a>
+<a> End Date: <input type="date" name="end_date" id = "end_date_id" required><br /><br /> </a>
+<script>
+var startDate = document.getElementById("start_date_id").value;
+var endDate = document.getElementById("end_date_id").value;
+if (startDate>endDate)
+ {
+ alert(startDate + " cannot be higher than " + endDate);
+ }
+</script>
+
+<input type="submit" value="Get my report">
+</form>
+
+<br />
+</body>
+</html>

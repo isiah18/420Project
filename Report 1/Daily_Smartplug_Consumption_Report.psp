@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<%@page language="PL/SQL"%>
+<%@plsql procedure="daily_smartplug_consumption_report"%>
+
+<%@plsql parameter="splug_id_val" %>
+<%@plsql parameter="start_date" %>
+<%@plsql parameter="end_date"%>
+
+
+<%@plsql parameter="FormsButton1"%>
+
+
+<!-- Calculates total dollar amount and wattage of appliances -->
+<%! total_money_calc varchar2(20); %> 
+<%! total_wattage_calc appliance.wattage%type; %>
+
+
+<!--Store name of the smartplug -->
+<%! smart_plug_name_val  type_of_appliance.category_name%type; %>
+
+<!--Calculates total energy between the start and end dates  for the smartplug -->
+<%! total_energy_val  appliance.wattage%type; %>
+<%! total_energy_val_char varchar2(20); %>
+
+<!--Variables created to calculate distribution and formatting the numbers -->
+<%! wattage_val appliance.wattage%type; %>
+<%! individual_wattage number; %>
+<%! wattage_distribution number; %>
+<%! wattage_distribution_char varchar(20); %>
+<%! money_distribution varchar2(20);%>
+<%! rowcount_val number; %>
+
+<head>
+<title>User Smartplug Consumption</title>
+
+
+</head>
+<body>
+<div align="center"><p><h1>User Smartplug Consumption Report</p></h1>
+<hr/></div>
+
+<%
+ -- Calculates total energy between the start and end dates  for the smartplug
+select count(*) into rowcount_val
+from appliance
+where splug_id=splug_id_val
+and trunc(date_and_time) >= to_date(start_date, 'YYYY-MM-DD')
+and trunc(date_and_time) <= to_date(end_date, 'YYYY-MM-DD');
+if (rowcount_val =0)
+then total_energy_val := 0;
+else
+select sum(wattage) into total_energy_val
+from appliance
+where splug_id=splug_id_val
+and trunc(date_and_time) >= to_date(start_date, 'YYYY-MM-DD')
+and trunc(date_and_time) <= to_date(end_date, 'YYYY-MM-DD');
+end if;
+
+total_energy_val_char := to_char(total_energy_val, '9999.99');
+
+--Calculates total money using the variable above
+total_money_calc := to_char((0.9 * total_energy_val), '9999.99');
+
+-- Calculates total wattage of applainces using selected smartplug
+select sum(wattage) into total_wattage_calc
+from appliance
+where splug_id=splug_id_val;
+
+--Store name of smartplug
+select category_name into smart_plug_name_val
+from type_of_appliance
+where splug_id=splug_id_val;
+%>
+<a>Below is the information for the smartplug <%=smart_plug_name_val%> 
+between the period of <%=start_date%> to <%=end_date%>: </a></br>
+<ul>
+<a><li>Number of days when power is consumed: <%=rowcount_val%> </li> </a> <br /></br>
+<a><li>Total Energy: <%=total_energy_val_char%> </li> </a> <br /></br>
+<a><li>Total Cost:  $<%=total_money_calc%> </li> </a><br /></br>
+</ul>
+<a> Below is the User Smartplug Consumption Report: <br /><br />
+<!-- Creates the heading of the table used for report-->
+<table border="1" cellspacing="1" cellpadding="5">
+<tr align="left">
+<a><th>Appliance Description</th> </a>
+<a><th>Appliance Wattage</th></a>
+<a><th>Appliance Type</th></a>
+<a><th>Wattage/Appliance</th></a>
+<a><th>Money/Appliance</th></a>
+</tr>
+<!-- The block below creates a cursor which loops through the appliance and appliance_type table
+to get the information about the appliance-->
+<%
+declare
+cursor c1 is
+select appliance.make, appliance.model, appliance.wattage, type_of_appliance.category_name
+from appliance, type_of_appliance
+where appliance.splug_id = splug_id_val
+and appliance.category_id = type_of_appliance.category_id;
+
+r c1%rowtype;
+begin
+open c1;
+loop
+fetch c1 into r;
+exit when c1%NOTFOUND; 
+wattage_val := r.wattage; --Stores the wattage
+individual_wattage := wattage_val/total_wattage_calc; --Calculates wattage of each appliance
+if (rowcount_val =0)
+then wattage_distribution :=0;
+else
+wattage_distribution := (individual_wattage * total_energy_val); --Calculates wattage per appliance with total energy kwh
+end if;
+wattage_distribution_char := to_char(wattage_distribution, '9999.99'); --Formates the variable above
+money_distribution := to_char((wattage_distribution * 0.9), '9999.99'); --Calculates money using the wattage distribution
+%>
+
+<!-- Creates rows with data containing the appliance and distribution information -->
+<tr>
+<td><%=r.make%> </td> 
+<td><%=wattage_val%> </td>
+<td><%=r.category_name%> </td>
+<td><%=wattage_distribution_char%> </td>
+<td>$<%=money_distribution%> </td>
+</tr>
+<%end loop;%>
+<%close c1;%>
+<%end;%>
+<!-- Cursor ended-->
+</table>
+<br />
+
+</body>
+</html>

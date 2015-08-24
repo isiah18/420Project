@@ -1,0 +1,56 @@
+<%--Isiah Singh --%>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+<%@page language= "PL/SQL"%>
+<%@plsql procedure= "top3smartplugbyweek"%>
+
+<%!
+counter number;
+totalused number;
+cursor auto_cur is 
+select splug_id, (max(kwh)- min(kwh)) as totalused
+from energy_usage
+group by splug_id
+order by totalused desc;
+c1 auto_cur%rowtype;
+%>
+
+
+<head>
+	<title>Top 3 Smart Plugs by Week</title>
+</head>
+<body>
+	<p><h1 align="center"><u>Top 3 Smart Plug Consumption By Week</u></h1></p>
+	<br />
+	<div align="center"><a href="http://oracle.is.umbc.edu:8080/classpsp/IS420_DREAM_TEAM.admin_home"><b>Home</b></a></div>
+	<div align="center"><a href="http://oracle.is.umbc.edu:8080/classpsp/IS420_DREAM_TEAM.login_user"><b>Log Out</b></a></div>
+	<br />
+	<h3 align="center"> Top 3 Smart Plugs</h3>
+	<p><center> Please choose one of the top 3 smart plugs to see more information and the consumption by week! </center></p>
+	<center>
+	<form action="http://oracle.is.umbc.edu:8080/classpsp/IS420_DREAM_TEAM.weekresponse" method="get">
+		<select name="plugselection">
+			<option value="prompt" disabled selected>Select A Smart Plug</option>
+			<% 	counter := 0;
+			for c1 in auto_cur
+			loop
+			%>
+			<option value=<%= c1.splug_id %>><%= c1.splug_id %></option>
+		
+			<% counter := counter + 1;
+				exit when counter = 3;
+				end loop;
+			%> 
+		</select>
+		<br />
+		<br />
+		<input type="submit"" name="SubmitButton1" value="Submit">
+	</form>
+	</center>
+	
+	<% exception when others then %>
+	<%= sqlerrm %>
+	
+</body>
+</HTML>

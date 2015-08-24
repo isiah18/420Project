@@ -1,0 +1,25 @@
+<!DOCTYPE(HTML(PUBLIC("@//W3C//DTD(HTML(4.01(Transitional//EN">
+<html>
+<%@page language="PL/SQL"%>
+<%@plsql procedure="select_smart_plug"%>
+<head>
+<title>Display Smart Plug Appliances </title>
+</head>
+<body>
+<div align="center"><p><h2>Display Smart Plug Appliances</p></h2>
+<form action="http://oracle.is.umbc.edu:8080/classpsp/IS420_Dream_Team.display_appliances"
+method="post"><br>
+<hr/></div>
+<select name="sp_option">
+<option value=""> (Choose Your User ID From The List Below.)</option>
+<%for sp_row in(select splug_id,cust_id from smart_plug) loop%>
+<option value="<%=sp_row.splug_id%>"><%=sp_row.cust_id%></option>
+<%end loop;%>
+</select>
+<input type="submit" name="formsbutton1" value="Submit"/>
+</form>
+<%EXCEPTION
+when others then %>
+<%=sqlerrm%>
+</body>
+</html>

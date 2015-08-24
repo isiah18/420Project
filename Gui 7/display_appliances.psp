@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<%@page language="PL/SQL"%>
+<%@plsql procedure="display_appliances"%>
+<%@plsql parameter="sp_option" default="null"%> 
+<%@plsql parameter="formsbutton1" default="null"%>
+<head>
+<title>Display Smartplug Appliances</title>
+</head>
+<body>
+<div align="center"><p><h2>Display Smartplug Appliances</h2></p>
+
+<hr/></div>
+<%if sp_option is not null then%>
+<table border="0" cellpadding="1" cellspacing="1" summary="">
+<tr><th align="left"> &nbsp; Appliance ID &nbsp;</th><th align="left">&nbsp; Make &nbsp;</th><th align="left">&nbsp; Model &nbsp;</th><th align="left">&nbsp; Splug_id &nbsp;</th><th align = "left">&nbsp; Wattage &nbsp;</th><th align= "left"> &nbsp; <th align= "left"></th></tr>
+<%for app_row in (select appliance_id, make, model, splug_id, wattage from appliance where appliance.splug_id = sp_option
+ )loop%>
+<tr><td align="left"><%=app_row.appliance_id%></td>
+<td align ="left"><%=app_row.make%></td>
+<td align="left"><%=app_row.model%></td>
+<td align="left"><%=app_row.splug_id%></td>
+<td align="left"><%=app_row.wattage%></td>
+
+</tr>
+<%end loop;%>
+</table>
+<div align="center">
+<a href="http://oracle.is.umbc.edu:8080/classpsp/IS420_DREAM_TEAM.select_smart_plug">Back To Select A Smart Plug</a><br>
+<hr/></div>
+<%else%>
+<p>You did not select a smart plug.</p><br>
+<div align="center">
+<a href="http://oracle.is.umbc.edu:8080/classpsp/IS420_DREAM_TEAM.select_smart_plug">Back To Select A Smart Plug</a><br>
+<hr/></div>
+<%end if;%>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<%--Isiah Singh --%>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+<%@page language= "PL/SQL"%>
+<%@plsql procedure= "top3plugbydollar"%>
+<%!
+counter number;
+totalused number;
+totalpower number;
+
+cursor auto_cur is 
+select splug_id, (max(kwh)- min(kwh)) as totalused
+from energy_usage
+group by splug_id
+order by totalused desc;
+c1 auto_cur%rowtype;
+
+cursor app_cur is 
+select category_name
+from type_of_appliance, appliance
+where type_of_appliance.CATEGORY_ID = appliance.category_id and
+appliance.splug_id = c1.splug_id;
+c2 app_cur%rowtype;
+
+%>
+
+
+<head>
+	<title>Top 3 Smart Plugs by $</title>
+</head>
+<body>
+	<p><h1 align="center"><u>Top 3 Smart Plug Consumption By Dollars Spent</u></h1></p>
+	<br />
+	<div align="center"><a href="http://oracle.is.umbc.edu:8080/classpsp/IS420_DREAM_TEAM.admin_home"><b>Home</b></a></div>
+	<div align="center"><a href="http://oracle.is.umbc.edu:8080/classpsp/IS420_DREAM_TEAM.login_user"><b>Log Out</b></a></div>
+	<br />
+	<h3 align="center">Top 3 Smart Plugs</h3>
+	
+	<table align ="center" width="50%" height = "20%" border="2">
+	<tr>
+	<th align="left"><u>Smart Plug</u></th>
+	<th align="left"><u>Appliances</u></th>
+	<th align="left"><u>Power Consumed</u></th>
+	<th align="left"><u>Total KWH</u></th>
+	<th align="left"><u>Dollar Amount</u></th>
+	</tr>
+	
+	<% 	counter := 0;
+		for c1 in auto_cur
+		loop
+	%>
+	<%	select sum(instantaneous_power_wattage) into totalpower
+		from energy_usage
+		where splug_id = c1.splug_id;
+	%>
+	
+	<tr>
+		<td><%= c1.splug_id %></td>
+		<td><%= totalpower %> watts</td>
+		<td><%= c1.totalused %></td>
+		<td>$ <%= c1.totalused *.135 %></td>
+	</tr>
+	
+	<% counter := counter + 1;
+		exit when counter = 3;
+		end loop;
+	%> 
+
+</table>
+</body>
+</HTML>

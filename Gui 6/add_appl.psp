@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC"-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<%@page language="PL/SQL"%>
+<%@plsql procedure="add_appl"%>
+<head>
+<title> Add an Appliance to a Smart Plug</title>
+</head>
+<body>
+<div align="center"><p><h2> Add Smart Plug</h2></p>
+<a href="http://oracle.is.umbc.edu:8080/classpsp/IS420_DREAM_TEAM.add_appl">Home</a><br>
+<hr/></div><br>
+
+<form action="http://oracle.is.umbc.edu:8080/classpsp/IS420_DREAM_TEAM.add_smartplug" method="post">
+
+
+
+<%! 
+ newapp_id number;
+  CURSOR smartplugs IS
+  SELECT splug_id
+  FROM smart_plug;
+%>
+
+<%! 
+  CURSOR appliance IS
+  SELECT category_name,category_ID
+  FROM Type_of_appliance;
+  
+%>
+<%
+select max(appliance_id) + 1 into newapp_id
+from appliance;
+
+%>
+
+<tr>
+   <td align="right">Select Smartplug ID:</td>
+          <td>
+            <select size=1 name="plug">
+            <% FOR add_app IN smartplugs LOOP%>
+            <option value="<%=add_app.splug_id%>"><%=add_app.splug_id%></option>
+            <% END LOOP; %>
+            </select>
+          </td>
+        </tr>
+		
+		<br /> 
+<tr>
+   <td align="right">Appliance Type:</td>
+          <td>
+            <select size=1 name="appliance_type">
+            <% FOR add_appl IN appliance LOOP%>
+            <option value="<%=add_appl.category_ID%>"><%=add_appl.category_name%></option>
+            <% END LOOP; %>
+            </select>
+          </td>
+        </tr>
+	
+	
+	<br>
+Appliance ID: <input type="text" name="Appliance_ID" value= <%=newapp_id%> readonly />
+<br>	
+Appliance Make: <input type="text" name="description_make" value="" />
+<br>
+Appliance Model: <input type="text" name="description_model" value="" />
+<br>
+Appliance Wattage: <input type="text" name="wattage_text" value="" />
+<br><br>
+
+</tr> </table>
+<input type="submit" name="SubmitButton" value="Add"/>
+
+</form>
+<%exception when others then%>
+<%='please....'%>
+</body>
+</html>

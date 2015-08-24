@@ -1,0 +1,109 @@
+<%-- Isiah Singh --%>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+<%@page language= "PL/SQL"%>
+<%@plsql procedure= "weekresponse"%>
+<%@plsql parameter="plugselection" default="null"%>
+<%@plsql parameter="SubmitButton1" default="null"%>
+
+<%!
+start_date date;
+end_date date;
+week number;
+totpowerusage number;
+
+cursor auto_cur is 
+select category_name, wattage, make, model, smart_plug.splug_id, customer.cust_id, cust_type, first_name
+from type_of_appliance, appliance, smart_plug, customer
+where type_of_appliance.category_id = appliance.category_id and appliance.splug_id = smart_plug.splug_id and smart_plug.cust_id = customer.cust_id
+and appliance.splug_id = plugselection; 
+app_cur auto_cur%rowtype;
+%>
+
+<head>
+	<title>Smart Plug Consumption by Week</title>
+</head>
+<body>
+	<p><h1 align="center"><u>Smart Plug Consumption By Week</u></h1></p>
+	<br />
+	<div align="center"><a href="http://oracle.is.umbc.edu:8080/classpsp/IS420_DREAM_TEAM.admin_home"><b>Home</b></a></div>
+	<div align="center"><a href="http://oracle.is.umbc.edu:8080/classpsp/IS420_DREAM_TEAM.login_user"><b>Log Out</b></a></div>
+	<br />
+	<h3 align="center"> Information for Smart Plug <%= plugselection %></h3>
+	<br />
+	
+	<% week := 7;
+	select min(to_date(date_and_time,'MM/DD/YY HH24:MI')) into start_date
+	from energy_usage
+	where splug_id = plugselection; 
+	select max(to_date(date_and_time,'MM/DD/YY HH24:MI')) into end_date
+	from energy_usage
+	where splug_id = plugselection; 
+	%>
+	
+	<% while start_date <= end_date
+	loop
+		select sum(instantaneous_power_wattage) into totpowerusage
+		from energy_usage
+		where splug_id = plugselection and to_date(DATE_AND_TIME,'MM/DD/YY HH24:MI') >= start_date
+		and to_date(DATE_AND_TIME,'MM/DD/YY HH24:MI') <=  start_date + week;
+	%>
+	<table align ="center" width="50%" border="1">
+		<tr>
+		<th align="left"><u>Dates of the Week</u></th>
+		<th align="left"><u>Power Consumed</u></th>
+		</tr>
+		<tr>
+			<td><%= to_char(start_date, 'MM/DD/YY HH24:MI') %> -- <%= to_char(start_date + week, 'MM/DD/YY HH24:MI') %></td>
+			<td><%= totpowerusage %> Watts</td>
+		</tr>
+			
+		<%	start_date := start_date + week;
+			end loop;
+		%>
+		
+		
+	</table>
+	<br />
+	<br />
+	<br />
+	
+	<h3 align="center">Smart Plug <%= plugselection %> Information </h3>
+	<br />
+	<table align="center" width="50%" border="1">
+		<tr>
+			<th align="left">Smart Plug</th>
+			<th align="left">Owner</th>
+			<th align="left">Owner ID</th>
+			<th align="left">Owner Type</th>
+			<th align="left">Appliance Category</th>
+			<th align="left">Make</th>
+			<th align="left">Model</th>
+			<th align="left">Wattage</th>
+		</tr>
+		
+		<% 	for app_cur in auto_cur
+			loop
+		%>
+
+		<tr>
+			<td><%= app_cur.splug_id %></td>
+			<td><%= app_cur.first_name %></td>
+			<td><%= app_cur.cust_id %></td>
+			<td><%= app_cur.cust_type %></td>
+			<td><%= app_cur.category_name %></td>
+			<td><%= app_cur.make %></td>
+			<td><%= app_cur.model %></td>
+			<td><%= app_cur.wattage %></td>
+		</tr>
+		
+	<% end loop; %>
+	</table>
+	
+	
+<% exception when others then %>
+<%= sqlerrm %>
+		
+</body>
+</HTML>

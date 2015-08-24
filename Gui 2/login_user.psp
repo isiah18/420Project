@@ -1,0 +1,32 @@
+<%--Isiah Singh --%>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<%@page language="PL/SQL"%>
+<%@plsql procedure="login_user"%>
+<head>
+
+<title>User Login</title>
+</head>
+<body>
+<center>
+<div align="header"><u><b><h1>User Login</h1></b></u><br />
+(All entries must be completed)</div>
+<br />
+<br />
+<form action="http://oracle.is.umbc.edu:8080/classpsp/IS420_DREAM_TEAM.confirm_login" method="post">
+Email: <input type="text" name="username_text" value=""/> <br />
+Password: <input type="password" name="pass_text" value="" /> <br />
+User Type: <input type="radio" name="user_type_text" value="R"/> Regular
+	   <input type="radio" name="user_type_text" value="A"/> Admin <br />
+
+<input type= "submit" name="login_user_button" value="Log In"/>
+</form>
+<a href="http://oracle.is.umbc.edu:8080/classpsp/IS420_DREAM_TEAM.Input_Password"><b>Forgot Password?</b></a>
+<br />
+<br />
+Dont have an account? Create one <a href="http://oracle.is.umbc.edu:8080/classpsp/IS420_DREAM_TEAM.create_new_user"><b>Here</b></a>
+</div>
+</center>
+</body>
+</html>

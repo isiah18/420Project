@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<%@page language="PL/SQL"%>
+<%@plsql procedure="create_new_user_result"%>
+<%@plsql parameter="fName1"%>
+<%@plsql parameter="lName1"%>
+<%@plsql parameter="address1"%>
+<%@plsql parameter="city1"%>
+<%@plsql parameter="state1"%>
+<%@plsql parameter="zip1"%>
+<%@plsql parameter="password1"%> 
+<%@plsql parameter="email1"%> 
+<%@plsql parameter="sec_que1" type="NUMBER"%>
+<%@plsql parameter="sec_ans1"%> 
+<%@plsql parameter="form1" default="null"%>
+<%!newuserid customer.street_address%type;%>
+<head>
+<title>Create New User Result</title>
+</head>
+<div align="center"><h1>New User Form</h1>
+</div>
+<br>
+<body>
+<% 
+  select CUSTOMER_SEQ.nextval into newuserid
+     from dual;
+  insert into customer 
+    values(newuserid, 'R', fName1, lName1, address1, state1, city1, zip1, password1, email1, sec_que1, sec_ans1, '0.14');
+  commit;
+%>
+New user has been successfully added with the following attributes: </br>
+<ul>
+<li>First Name: <%=fName1%></li></br>
+<li>Last Name: <%=lname1%></li></br>
+<li>Street Address: <%=address1%></li></br>
+<li>State:  <%=state1%></li></br>
+<li>City:  <%=city1%></li></br>
+<li>Zip:  <%=zip1%></li></br>
+<li>Password: <%=password1%></li></br>
+<li>Email: <%=email1%></li></br>
+<li>Security Question:  <%=sec_que1%></li></br>
+<li>Security Answer:  <%=sec_ans1%></li></br>
+
+</ul>
+<div class="copyright" align="center">
+</div>
+</body>
+<%exception
+when others then%>
+<%=sqlerrm%>
+</html>

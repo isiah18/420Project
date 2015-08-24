@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<%@ page language="PL/SQL" %>
+<%@ plsql procedure="Email_Question" %>
+<%@ plsql parameter="E_mail" default="NULL" %>
+<%@ plsql parameter="formsbutton1" default="NULL" %>
+
+<%!
+secret_Q_ID varchar2(50);
+question varchar2(50);
+%>
+
+
+<head>
+<title>Recover Password</title>
+</head>
+<body>
+<h1>Recover Your password</h1>
+<a href='http://oracle.is.umbc.edu:8080/classpsp/IS420_DREAM_TEAM.Input_Password'>Home</a>
+<hr>
+
+<%
+select s_question into question
+from security_question, customer
+where security_question.security_q_id = customer.security_q_id and Email = E_mail;
+%>
+
+<p>
+Your secret question is: <br /> <%= question %><br />
+Please answer your question in the form below to complete the password recovery process.
+</p>
+<table>
+
+<tr>
+            <td>Email: </td>
+            <td><%=E_mail%></td>
+</tr>
+<form action="http://oracle.is.umbc.edu:8080/classpsp/IS420_DREAM_TEAM.Create_Password" method="POST">
+<tr>
+            <td>Answer: </td>
+            <td><input type="text" name="Secret_a" /></td>
+</tr>
+</table>
+<input type="hidden" name="E_mail" value="<%=E_mail%>">
+<input type="submit" name="formsbutton1" value="submit" />
+</form>
+<%exception when no_data_found then%>
+<p> No Email found, Please Try Again!</p>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+<%@page language= "PL/SQL"%>
+<%@plsql procedure= "dist_consumption"%>
+
+<head>
+
+</head>
+<body>
+
+<form action="http://oracle.is.umbc.edu:8080/classpsp/IS420_DREAM_TEAM.dist_response" method="get">
+<a>Smart Plug: <select name="splug_id_text"> </a>
+<% for list_row in (select splug_id from smart_plug) loop %>
+<option value="<%=list_row.splug_id%>"><%=list_row.splug_id%></option>
+<% end loop; %>
+</select> <br /><br />
+<a>Start Date: (MM/DD/YYYY) <input type="text" name="start_date" required><br /><br /> </a>
+<a> End Date: (MM/DD/YYYY) <input type="text" name="end_date" required><br /><br /> </a>
+
+
+<input type="submit" name="submitbutton1"" value="Get my report">
+</form>
+
+
+</body>
+</html>

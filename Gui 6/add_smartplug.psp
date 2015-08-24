@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<%@page language="PL/SQL"%>
+
+<%@plsql procedure="add_smartplug"%>
+
+<%@plsql parameter="plug"%>
+<%@plsql parameter="appliance_type"%>
+<%@plsql parameter="appliance_id"%>
+<%@plsql parameter="description_make"%>
+<%@plsql parameter="description_model"%>
+<%@plsql parameter="wattage_text"%>
+<%@ plsql parameter="submitbutton" default="NULL" %>
+
+
+
+
+
+    <% IF wattage_text = '' or description_make = '' or description_model= '' THEN %>
+      <p> Wattage is required</p>
+      
+      <%ELSE
+        
+        INSERT INTO appliance values(appliance_id,appliance_type,plug, wattage_text, description_make,description_model);
+      %>
+      
+      <p> Congrats! Your new appliance has been added</p>
+	  
+     <%END IF;%>
+    
+
+
+<%exception when others then%>
+
+
+<p>Try Again, Please Insert All Correct Values!</p>
+
+</body>
+</html>

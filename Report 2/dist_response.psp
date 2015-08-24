@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+<%@page language= "PL/SQL"%>
+<%@plsql procedure= "dist_response"%>
+<%@plsql parameter="splug_id_text" default="null"%>
+<%@plsql parameter="start_date" default="null"%>
+<%@plsql parameter="end_date" default="null"%>
+<%@plsql parameter="submitbutton1" default="null"%>
+
+
+<%! totkwh number; 
+totwattage number;
+proportion number;
+distkwh number;
+kwhmoney number; 
+%>
+
+
+<head>
+<title>Distributed Consumption</title>
+</head>
+<body>
+<h2><u>Distributed Smart Plug Consumption</u></h2>
+<% if start_date > end_date then %>
+	Sorry the time slot you picked is invalid. Start date must be before the End date.
+<% else %>
+
+	<table align ="center" width="50%" border="1">
+	<tr>
+	<th align="left"><u>Type</u></th>
+	<th align="left"><u>Make</u></th>
+	<th align="left"><u>Model</u></th>
+	<th align="left"><u>Wattage</u></th>
+	<th align="left"><u>KWh Consumed</u></th>
+	<th align="left"><u>Dollar Amount</u></th>
+	</tr>
+<%
+	select max(kwh)-min(kwh) into totkwh
+	from energy_usage
+	where splug_id = splug_id_text and trunc(to_date(date_and_time, 'MM/DD/YYYY HH24:MI')) >= to_date(start_date, 'MM/DD/YYYY') and trunc(to_date(date_and_time, 'MM/DD/YYYY HH24:MI')) <= to_date(end_date, 'MM/DD/YYYY');
+	
+	select sum(wattage) into totwattage
+	from appliance
+	where splug_id = splug_id_text;
+	
+	select electric_rate into kwhmoney
+	from customer, smart_plug
+	where customer.cust_id = smart_plug.cust_id and smart_plug.splug_id = splug_id_text;
+	
+	for cur_row in (select category_name, make, model, wattage from appliance, type_of_appliance where appliance.category_id = type_of_appliance.category_id and 
+	splug_id = splug_id_text) loop
+	proportion := cur_row.wattage / totwattage;
+	distkwh := proportion * totkwh;
+%>
+	
+	<tr>
+		<td><%= cur_row.category_name%></td>
+		<td><%= cur_row.make %> </td>
+		<td><%= cur_row.model %></td>
+		<td><%= cur_row.wattage %> watts</td>
+		<td><%= trunc(distkwh,3) %></td>
+		<td>$ <%= trunc(distkwh * kwhmoney, 2) %></td>
+	</tr>
+	
+<% end loop; %>
+
+</table>
+
+<% end if; %>
+<%exception when others then %>
+<%= sqlerrm %>
+
+</body>
+</html>
